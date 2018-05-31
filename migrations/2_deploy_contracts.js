@@ -17,16 +17,16 @@ module.exports = async function(deployer, network, accounts) {
     const owner = accounts[0];
     
     // wallet where the ehter will get deposited
-    const wallet = '0xb0ac3d14b456b070544Dd960bf3a516Ee6C1E4Fe';
-    //const wallet = '0xfB4CC5388846F303d2280E071aA0331B59bB009a'; //Develop
+    //const wallet = '0xb0ac3d14b456b070544Dd960bf3a516Ee6C1E4Fe';
+    const wallet = accounts[1]; //Develop
     
     // tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
-    const tokenWallet = '0x1CcaC55a4cF6B4a4498F2c5d939Af4cfADF0F0A5';
-    //const tokenWallet = '0x572813700Adda59F3EAa52B244c4FD716FA7bc48'; //Develop
+    //const tokenWallet = accounts[0];
+    const tokenWallet = accounts[0]; //Develop
 
-    const rate = new web3.BigNumber(10);
+    const rate = new web3.BigNumber(100);
     console.log("rate " + rate);
-    const openingTime = Date.now()/1000|0 + 1000;
+    const openingTime = Date.now()/1000|0 + 100;
     console.log("openingTime " + openingTime);
     const closingTime = openingTime + duration.weeks(1);
     console.log("closingTime " + closingTime);
@@ -37,7 +37,7 @@ module.exports = async function(deployer, network, accounts) {
 
     console.log("=============Start Deploy============");
 
-    deployer.deploy(AqwireToken).then(function() {
+    deployer.deploy(AqwireToken, { from: owner }).then(function() {
         console.log("AqwireToken " + AqwireToken.address);
         const tokenAddress = AqwireToken.address;
         return deployer.deploy(
@@ -49,13 +49,15 @@ module.exports = async function(deployer, network, accounts) {
             hardCap, 
             tokenWallet,
             softCap,
-            AqwireToken.address
+            AqwireToken.address,
+            { from: owner }
         ).then(async function() {
             const CoinInstance = AqwireToken.at(tokenAddress);
             const crowdsaleAddress = AqwireContract.address;
-            const totalSupply = await CoinInstance.totalSupply();
-            await CoinInstance.transfer(tokenWallet, totalSupply);
-            await CoinInstance.approve(crowdsaleAddress, totalSupply);
+            const totalSupply = await CoinInstance.totalSupply({ from: owner });
+            await CoinInstance.transfer(tokenWallet, totalSupply, { from: owner });
+            await CoinInstance.approve(crowdsaleAddress, totalSupply, { from: tokenWallet });
+           
         });
     });
     

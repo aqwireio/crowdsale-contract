@@ -1604,57 +1604,6 @@
     "version": "0.4.24+commit.e67f0147.Emscripten.clang"
   },
   "networks": {
-    "4": {
-      "events": {
-        "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "name": "owner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "name": "spender",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "name": "value",
-              "type": "uint256"
-            }
-          ],
-          "name": "Approval",
-          "type": "event"
-        },
-        "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "name": "from",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "name": "to",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "name": "value",
-              "type": "uint256"
-            }
-          ],
-          "name": "Transfer",
-          "type": "event"
-        }
-      },
-      "links": {},
-      "address": "0x94ace8594f35180cdbdf2b0c355312d2d3028f94",
-      "transactionHash": "0x40bded8885e09119bae102ec3bad810b7bca4e8eb5c71b8c3d6950fd95e02ca5"
-    },
     "5777": {
       "events": {
         "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
@@ -1703,10 +1652,10 @@
         }
       },
       "links": {},
-      "address": "0x9f60f884e668e1776e0fef564672b321a664b3fb",
-      "transactionHash": "0x387757f61b62036483905bf9e72dfe7fd11d344b148fe9b77987a1c393965692"
+      "address": "0xc4207fe1b9fa865c1b81ca9a24b1411a6a781bc2",
+      "transactionHash": "0x833665225d328231693c4993b9712c8b12336a05f055327cbba9e4c894513a4f"
     }
   },
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-05-30T06:46:29.960Z"
+  "updatedAt": "2018-05-31T14:28:52.116Z"
 }
