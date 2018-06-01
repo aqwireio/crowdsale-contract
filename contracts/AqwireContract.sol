@@ -4,9 +4,10 @@ import "./AqwireToken.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/distribution/RefundableCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/emission/AllowanceCrowdsale.sol";
+import "../node_modules/openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
 
-contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, AllowanceCrowdsale {
+contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, Pausable, AllowanceCrowdsale {
 
     /**
     * @param _rate Number of token units a buyer gets per wei

@@ -55,7 +55,7 @@ module.exports = async function(deployer, network, accounts) {
             const CoinInstance = AqwireToken.at(tokenAddress);
             const crowdsaleAddress = AqwireContract.address;
             const totalSupply = await CoinInstance.totalSupply({ from: owner });
-            await CoinInstance.transfer(tokenWallet, totalSupply, { from: owner });
+            //await CoinInstance.transfer(tokenWallet, totalSupply, { from: owner });
             await CoinInstance.approve(crowdsaleAddress, totalSupply, { from: tokenWallet });
            
         });
