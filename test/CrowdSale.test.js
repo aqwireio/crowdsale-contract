@@ -23,7 +23,6 @@ contract('AqwireContract', function ([owner, wallet, investor]) {
   const _lessThanHardCap = ether(4);
   const _softCap = ether(3);
   const _lessThanSoftCap = ether(2);
-
   
   before(async function () {
     // Advance to the next block to correctly read time in the solidity "now" function interpreted by testrpc
@@ -39,26 +38,25 @@ contract('AqwireContract', function ([owner, wallet, investor]) {
 
     this.token = await AqwireToken.new({ from: owner });
     this.crowdsale = await AqwireContract.new(
-        this.startTime,
-        this.endTime,
-        RATE,
-        wallet, 
-        CAP, 
-        owner,
-        GOAL,
-        this.token.address,
-        { from: owner }
+      this.startTime,
+      this.endTime,
+      RATE,
+      wallet,
+      CAP,
+      owner,
+      GOAL,
+      this.token.address,
+      { from: owner }
     );
 
     const CoinInstance = this.token;
     const crowdsaleAddress = this.crowdsale.address;
     const totalSupply = await CoinInstance.totalSupply({ from: owner });
     await CoinInstance.transfer(owner, totalSupply, { from: owner });
-    await CoinInstance.approve(crowdsaleAddress, totalSupply, { from: owner }); 
+    await CoinInstance.approve(crowdsaleAddress, totalSupply, { from: owner });
   });
 
   describe('buying tokens', function () {
-    
     it('should create crowdsale with correct parameters', async function () {
       this.crowdsale.should.exist;
       this.token.should.exist;
@@ -73,24 +71,26 @@ contract('AqwireContract', function ([owner, wallet, investor]) {
       goal.should.be.bignumber.equal(GOAL);
       cap.should.be.bignumber.equal(CAP);
     });
-
     
     it('should not accept payments before start', async function () {
       await this.crowdsale.sendTransaction({ from: investor, to: this.crowdsale.address, value: this._value }).should.be.rejectedWith(EVMRevert);
     });
     
-    
-  
     it('should remove funds from buyer', async function () {
       await increaseTimeTo(this.startTime);
+      const walletBuyerBefore = web3.eth.getBalance(investor);
       const receipt = await this.crowdsale.sendTransaction(
         { from: investor, to: this.crowdsale.address, value: this._value });
 
-      const expectedTokenAmount = RATE.mul(this._value);
-      (await this.token.balanceOf(investor)).should.be.bignumber.equal(expectedTokenAmount);
+      const walletBuyerAfter = web3.eth.getBalance(investor);
 
+      const gasUsed = receipt.receipt.gasUsed;
+      const tx = await web3.eth.getTransaction(receipt.tx);
+      const gasPrice = tx.gasPrice;
+      const txCost = gasPrice.mul(gasUsed);
+      const expectedBuyerWallet = walletBuyerBefore.minus(this._value).minus(txCost);
+      walletBuyerAfter.should.be.bignumber.equal(expectedBuyerWallet);
     });
-
 
     it('should assign tokens to sender', async function () {
       await increaseTimeTo(this.startTime);
@@ -114,9 +114,7 @@ contract('AqwireContract', function ([owner, wallet, investor]) {
       await assertRevert(this.crowdsale.sendTransaction(
         { from: investor, to: this.crowdsale.address, value: ether(1) }));
     });
-
   });
-
 
   describe('softCap handling', function () {
     it('should deny refunds before end', async function () {
@@ -154,10 +152,8 @@ contract('AqwireContract', function ([owner, wallet, investor]) {
       post.minus(pre).should.be.bignumber.equal(_softCap);
     });
   });
-
   
   describe('hardCap handling', function () {
-    
     beforeEach(async function () {
       await increaseTimeTo(this.startTime);
     });
@@ -202,8 +198,5 @@ contract('AqwireContract', function ([owner, wallet, investor]) {
         capReached.should.equal(true);
       });
     });
-  
   });
-
-
 });

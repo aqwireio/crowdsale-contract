@@ -6,7 +6,18 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "truffle test --network development",
+    "test:testnet": "truffle test --network rinkeby",
+    "console": "truffle console",
+    "console:testnet": "truffle console --network development",
+    "migrate": "truffle migrate --network development --reset",
+    "migrate:testnet": "truffle migrate --network rinkeby --reset",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:sol": "solium -d .",
+    "lint:sol:fix": "solium -d . --fix",
+    "lint:all": "npm run lint && npm run lint:sol",
+    "lint:all:fix": "npm run lint:fix && npm run lint:sol:fix"
   },
   "author": "",
   "license": "ISC",
@@ -24,10 +35,20 @@
     "chai-bignumber": "^2.0.2",
     "npm": "^6.1.0",
     "openzeppelin-solidity": "^1.9.0",
+    "ganache-cli": "6.1.0",
+    "truffle": "^4.1.8",
     "truffle-hdwallet-provider": "0.0.5",
     "web3": "^1.0.0-beta.34"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-standard": "^12.0.0-alpha.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.7.0",
+    "eslint-plugin-standard": "^3.1.0",
+    "solium": "^1.1.7"
+  },
   "keywords": [],
   "description": ""
 }
