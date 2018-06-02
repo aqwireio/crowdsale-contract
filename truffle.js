@@ -3,7 +3,7 @@ require('babel-register')({
   })
 require('babel-polyfill')
 var HDWalletProvider = require("truffle-hdwallet-provider");
-var mnemonic = "ADD YOUR MNEMONIC HERE";
+var mnemonic = "ADD YOUR MNEMONIC HERE ";
 
 module.exports = {
     // Turns on the Solidity optimizer. For development the optimizer's
@@ -21,7 +21,7 @@ module.exports = {
     networks: {
         rinkeby: {
             provider: function() {
-                return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/YOUR API KEY")
+                return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/YOUR_API_KEY")
             },
             network_id: "*"
             //from: "0x26c197baba3891e6822b056650838a0d0c326706"

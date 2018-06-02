@@ -21,7 +21,7 @@ module.exports = {
     networks: {
         rinkeby: {
             provider: function() {
-                return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/YOUR API KEY")
+                return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/YOUR_API_KEY")
             },
             network_id: "*"
             //from: "0x26c197baba3891e6822b056650838a0d0c326706"
