@@ -20,17 +20,21 @@ Among other things, it can be used on the platform to:
 
 **Details:**
 > Token Supply: 180 million | 90 million will be sold (50%)
+
 > Price per token: $0.11
+
 > Cap: $9.9M Hardcap | $5M Softcap
+
 > Duration: Presale is LIVE and will run until June 15.
+
 > Bonuses: Up to 15% Bonus.
 
 For more information about AQWIRE and the crowdsale, go to:
 
-[AQWIRE KYC and Whitelisting process](https://medium.com/aqwire/https-medium-com-aqwire-aqwire-kyc-whitelisting-how-does-it-work-982cd51a8310)
-[AQWIRE KYC site](https://aqwire.io/kyc)
-[AQWIRE Whitepaper](https://aqwire.io/#whitepaper)
-[AQWIRE FAQ](https://medium.com/aqwire/https-medium-com-inno-91650-aqwire-frequently-asked-questions-e65555cb26eb)
+- [AQWIRE KYC and Whitelisting process](https://medium.com/aqwire/https-medium-com-aqwire-aqwire-kyc-whitelisting-how-does-it-work-982cd51a8310)
+- [AQWIRE KYC site](https://aqwire.io/kyc)
+- [AQWIRE Whitepaper](https://aqwire.io/#whitepaper)
+- [AQWIRE FAQ](https://medium.com/aqwire/https-medium-com-inno-91650-aqwire-frequently-asked-questions-e65555cb26eb)
 
 ## Documentation
 
