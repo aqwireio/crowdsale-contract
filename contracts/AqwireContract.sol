@@ -5,9 +5,10 @@ import "../node_modules/openzeppelin-solidity/contracts/crowdsale/distribution/R
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/emission/AllowanceCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsale.sol";
 
 
-contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, Pausable, AllowanceCrowdsale {
+contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, Pausable, AllowanceCrowdsale, WhitelistedCrowdsale {
 
     /**
     * @param _rate Number of token units a buyer gets per wei
@@ -42,7 +43,5 @@ contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, Pausable, Allow
         //the value needs to less or equal than a cap which is limit for accepted funds
         require(_softCap <= _hardCap);
     }
-
-
 
 }
