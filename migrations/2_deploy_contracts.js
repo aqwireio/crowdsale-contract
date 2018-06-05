@@ -19,8 +19,7 @@ module.exports = async function (deployer, network, accounts) {
   const wallet = accounts[1]; // Develop
     
   // tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
-  // const tokenWallet = accounts[0];
-  const tokenWallet = accounts[0]; // Develop
+  const tokenWallet = accounts[0];
 
   const rate = new web3.BigNumber(100);
   console.log('rate ' + rate);
@@ -52,7 +51,7 @@ module.exports = async function (deployer, network, accounts) {
       const CoinInstance = AqwireToken.at(tokenAddress);
       const crowdsaleAddress = AqwireContract.address;
       const totalSupply = await CoinInstance.totalSupply({ from: owner });
-      //await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
+      await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
       // await CoinInstance.transfer(tokenWallet, totalSupply, { from: owner });
       await CoinInstance.approve(crowdsaleAddress, totalSupply, { from: tokenWallet });
     });

@@ -52,7 +52,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     const CoinInstance = this.token;
     const crowdsaleAddress = this.crowdsale.address;
     const totalSupply = await CoinInstance.totalSupply({ from: owner });
-    //await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
+    await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
     //await CoinInstance.transfer(owner, totalSupply, { from: owner });
     // approve so they can invest in crowdsale
     await this.crowdsale.addToWhitelist(owner);
