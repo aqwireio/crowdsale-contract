@@ -31,10 +31,17 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
 
   beforeEach(async function () {
     this.startTime = latestTime() + duration.weeks(1);
-    this.endTime = this.startTime + duration.weeks(1);
+    this.endTime = this.startTime + duration.weeks(4);
     this.afterEndTime = this.endTime + duration.seconds(10);
     this._value = ether(1);
     this.tokens = RATE.mul(this._value);
+
+    this.firstBonus = new web3.BigNumber(110);
+    this.secondBonus = new web3.BigNumber(105);
+    this.finalRate = RATE;
+  
+    this.firstTimeBonusChange = this.startTime + duration.weeks(1);
+    this.secondTimeBonusChange = this.startTime + duration.weeks(2);
 
     this.token = await AqwireToken.new({ from: owner });
     this.crowdsale = await AqwireContract.new(
@@ -54,6 +61,10 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     const totalSupply = await CoinInstance.totalSupply({ from: owner });
     await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
     //await CoinInstance.transfer(owner, totalSupply, { from: owner });
+
+    // setup Bonus rates
+    await this.crowdsale.setCurrentRate(this.firstBonus, this.secondBonus, this.finalRate, this.startTime, this.firstTimeBonusChange, this.secondTimeBonusChange);
+    
     // approve so they can invest in crowdsale
     await this.crowdsale.addToWhitelist(owner);
     await this.crowdsale.addToWhitelist(investor);
@@ -111,7 +122,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
       walletBuyerAfter.should.be.bignumber.equal(expectedBuyerWallet);
     });
 
-    it('should assign tokens to sender', async function () {
+    it('should assign tokens to sender and have First Bonus', async function () {
       await increaseTimeTo(this.startTime);
       const balanceBuyerBefore = await this.token.balanceOf(investor);
 
@@ -119,7 +130,29 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
         { from: investor, to: this.crowdsale.address, value: this._value });
 
       const balanceBuyerAfter = await this.token.balanceOf(investor);
-      balanceBuyerAfter.should.be.bignumber.equal(balanceBuyerBefore.add(this.tokens));
+      balanceBuyerAfter.should.be.bignumber.equal(balanceBuyerBefore.add(this.firstBonus.mul(this._value)));
+    });
+
+    it('should assign tokens to sender and have Second Bonus', async function () {
+      await increaseTimeTo(this.firstTimeBonusChange + duration.seconds(10));
+      const balanceBuyerBefore = await this.token.balanceOf(investor);
+
+      await this.crowdsale.sendTransaction(
+        { from: investor, to: this.crowdsale.address, value: this._value });
+
+      const balanceBuyerAfter = await this.token.balanceOf(investor);
+      balanceBuyerAfter.should.be.bignumber.equal(balanceBuyerBefore.add(this.secondBonus.mul(this._value)));
+    });
+
+    it('should assign tokens to sender and have Final Rate', async function () {
+      await increaseTimeTo(this.secondTimeBonusChange + duration.seconds(10));
+      const balanceBuyerBefore = await this.token.balanceOf(investor);
+
+      await this.crowdsale.sendTransaction(
+        { from: investor, to: this.crowdsale.address, value: this._value });
+
+      const balanceBuyerAfter = await this.token.balanceOf(investor);
+      balanceBuyerAfter.should.be.bignumber.equal(balanceBuyerBefore.add(this.finalRate.mul(this._value)));
     });
 
     it('reverts when trying to buy tokens when contract is paused', async function () {
