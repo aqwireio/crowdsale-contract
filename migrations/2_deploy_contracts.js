@@ -25,11 +25,19 @@ module.exports = async function (deployer, network, accounts) {
   console.log('rate ' + rate);
   const openingTime = Date.now() / 1000 | 0 + 100;
   console.log('openingTime ' + openingTime);
-  const closingTime = openingTime + duration.weeks(1);
+  const closingTime = openingTime + duration.weeks(4);
   console.log('closingTime ' + closingTime);
   const hardCap = 300 * (10 ** 18);
   const softCap = 2 * (10 ** 18);
   console.log(openingTime, closingTime, rate, wallet, hardCap, tokenWallet, softCap);
+
+  const firstBonus = new web3.BigNumber(110);
+  const secondBonus = new web3.BigNumber(105);
+  const finalRate = rate;
+
+  const startTime = openingTime;
+  const firstTimeBonusChange = openingTime + duration.weeks(1);
+  const secondTimeBonusChange = openingTime + duration.weeks(2);
 
   console.log('=============Start Deploy============');
 
@@ -50,8 +58,13 @@ module.exports = async function (deployer, network, accounts) {
     ).then(async function () {
       const CoinInstance = AqwireToken.at(tokenAddress);
       const crowdsaleAddress = AqwireContract.address;
+      const ContractInstance = AqwireContract.at(crowdsaleAddress);
       const totalSupply = await CoinInstance.totalSupply({ from: owner });
       await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
+      
+      // setup Bonus rates
+      await ContractInstance.setCurrentRate(firstBonus, secondBonus, finalRate, startTime, firstTimeBonusChange, secondTimeBonusChange);
+      
       // await CoinInstance.transfer(tokenWallet, totalSupply, { from: owner });
       await CoinInstance.approve(crowdsaleAddress, totalSupply, { from: tokenWallet });
     });

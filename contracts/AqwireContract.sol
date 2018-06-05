@@ -6,6 +6,7 @@ import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/Cap
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/emission/AllowanceCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsale.sol";
+import "../node_modules/openzeppelin-solidity/contracts/crowdsale/price/IncreasingPriceCrowdsale.sol";
 
 
 contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, Pausable, AllowanceCrowdsale, WhitelistedCrowdsale {
@@ -42,6 +43,56 @@ contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, Pausable, Allow
         //As goal needs to be met for a successful crowdsale
         //the value needs to less or equal than a cap which is limit for accepted funds
         require(_softCap <= _hardCap);
+    }
+
+    uint256 public firstBonus;
+
+    uint256 public secondBonus;
+
+    uint256 public finalRate;
+
+    uint256 public startTime;
+
+    uint256 public firstTimeBonusChange;
+
+    uint256 public secondTimeBonusChange;
+
+    function setCurrentRate(
+        uint256 _firstBonus, 
+        uint256 _secondBonus, 
+        uint256 _finalRate, 
+        uint256 _startTime,
+        uint256 _firstTimeBonusChange,
+        uint256 _secondTimeBonusChange
+        )
+    public
+    onlyOwner {
+        require(_firstBonus >= _secondBonus);
+        require(_secondBonus >= _finalRate);
+        require(_finalRate > 0);
+        
+        firstBonus = _firstBonus;
+        secondBonus = _secondBonus;
+        finalRate = _finalRate;
+
+        startTime = _startTime;
+        firstTimeBonusChange = _firstTimeBonusChange;
+        secondTimeBonusChange = _secondTimeBonusChange;
+
+    }
+
+    function _getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
+        uint256 elapsedTime = block.timestamp.sub(startTime);
+
+        if (elapsedTime > secondTimeBonusChange) {
+            return _weiAmount.mul(finalRate);
+        }
+
+        if (elapsedTime > firstTimeBonusChange) {
+            return _weiAmount.mul(secondBonus);
+        }
+
+        return _weiAmount.mul(firstBonus);
     }
 
 }
