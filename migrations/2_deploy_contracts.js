@@ -15,18 +15,14 @@ module.exports = async function (deployer, network, accounts) {
   const owner = accounts[0];
     
   // wallet where the ehter will get deposited
-  // const wallet = '0xb0ac3d14b456b070544Dd960bf3a516Ee6C1E4Fe';
   const wallet = accounts[1]; // Develop
     
   // tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
   const tokenWallet = accounts[0];
 
   const rate = new web3.BigNumber(100);
-  console.log('rate ' + rate);
-  const openingTime = Date.now() / 1000 | 0 + 100;
-  console.log('openingTime ' + openingTime);
+  const openingTime = Date.now() / 1000 | 0 + 1000;
   const closingTime = openingTime + duration.weeks(4);
-  console.log('closingTime ' + closingTime);
   const hardCap = 300 * (10 ** 18);
   const softCap = 2 * (10 ** 18);
   console.log(openingTime, closingTime, rate, wallet, hardCap, tokenWallet, softCap);
@@ -42,7 +38,6 @@ module.exports = async function (deployer, network, accounts) {
   console.log('=============Start Deploy============');
 
   deployer.deploy(AqwireToken, { from: owner }).then(function () {
-    console.log('AqwireToken ' + AqwireToken.address);
     const tokenAddress = AqwireToken.address;
     return deployer.deploy(
       AqwireContract,
