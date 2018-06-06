@@ -60,7 +60,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     const crowdsaleAddress = this.crowdsale.address;
     const totalSupply = await CoinInstance.totalSupply({ from: owner });
     await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
-    //await CoinInstance.transfer(owner, totalSupply, { from: owner });
+    // await CoinInstance.transfer(owner, totalSupply, { from: owner });
 
     // setup Bonus rates
     await this.crowdsale.setCurrentRate(this.firstBonus, this.secondBonus, this.finalRate, this.startTime, this.firstTimeBonusChange, this.secondTimeBonusChange);
@@ -74,7 +74,6 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
 
     await CoinInstance.approve(crowdsaleAddress, totalSupply);
   });
-
 
   describe('buying tokens', function () {
     it('should create crowdsale with correct parameters', async function () {
@@ -171,7 +170,6 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
   });
 
   describe('Whitelisting', function () {
-
     beforeEach(async function () {
       await await increaseTimeTo(this.startTime);
 
@@ -181,20 +179,20 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
 
     describe('accepting payments', function () {
       it('should accept payments to whitelisted (from whichever buyers)', async function () {
-        await this.crowdsale.buyTokens(authorized, {value: this._value, from: authorized}).should.be.fulfilled;
-        await this.crowdsale.buyTokens(authorized, {value: this._value, from: unauthorized}).should.be.fulfilled;
+        await this.crowdsale.buyTokens(authorized, { value: this._value, from: authorized }).should.be.fulfilled;
+        await this.crowdsale.buyTokens(authorized, { value: this._value, from: unauthorized }).should.be.fulfilled;
       });
 
       it('should reject payments to not whitelisted (from whichever buyers)', async function () {
-        await this.crowdsale.send({value: this._value, from: unauthorized}).should.be.rejected;
+        await this.crowdsale.send({ value: this._value, from: unauthorized }).should.be.rejected;
 
-        await this.crowdsale.buyTokens(unauthorized, {value: this._value, from: unauthorized}).should.be.rejected;
-        await this.crowdsale.buyTokens(unauthorized, {value: this._value, from: authorized}).should.be.rejected;
+        await this.crowdsale.buyTokens(unauthorized, { value: this._value, from: unauthorized }).should.be.rejected;
+        await this.crowdsale.buyTokens(unauthorized, { value: this._value, from: authorized }).should.be.rejected;
       });
 
       it('should reject payments to addresses removed from whitelist', async function () {
         await this.crowdsale.removeFromWhitelist(authorized);
-        await this.crowdsale.buyTokens(authorized, {value: this._value, from: authorized}).should.be.rejected;
+        await this.crowdsale.buyTokens(authorized, { value: this._value, from: authorized }).should.be.rejected;
       });
     });
 
@@ -210,33 +208,31 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
 
     describe('accepting payments', function () {
       it('should accept payments to whitelisted (from whichever buyers)', async function () {
-
-        await this.crowdsale.buyTokens(authorized, {value: this._value, from: authorized}).should.be.fulfilled;
-        await this.crowdsale.buyTokens(authorized, {value: this._value, from: unauthorized}).should.be.fulfilled;
+        await this.crowdsale.buyTokens(authorized, { value: this._value, from: authorized }).should.be.fulfilled;
+        await this.crowdsale.buyTokens(authorized, { value: this._value, from: unauthorized }).should.be.fulfilled;
         await this.crowdsale.buyTokens(anotherAuthorized, {
           value: this._value,
-          from: authorized
+          from: authorized,
         }).should.be.fulfilled;
         await this.crowdsale.buyTokens(anotherAuthorized, {
           value: this._value,
-          from: unauthorized
+          from: unauthorized,
         }).should.be.fulfilled;
       });
 
       it('should reject payments to not whitelisted (with whichever buyers)', async function () {
+        await this.crowdsale.send({ value: this._value, from: unauthorized }).should.be.rejected;
 
-        await this.crowdsale.send({value: this._value, from: unauthorized}).should.be.rejected;
-
-        await this.crowdsale.buyTokens(unauthorized, {value: this._value, from: unauthorized}).should.be.rejected;
-        await this.crowdsale.buyTokens(unauthorized, {value: this._value, from: authorized}).should.be.rejected;
+        await this.crowdsale.buyTokens(unauthorized, { value: this._value, from: unauthorized }).should.be.rejected;
+        await this.crowdsale.buyTokens(unauthorized, { value: this._value, from: authorized }).should.be.rejected;
       });
 
       it('should reject payments to addresses removed from whitelist', async function () {
         await this.crowdsale.removeFromWhitelist(anotherAuthorized);
-        await this.crowdsale.buyTokens(authorized, {value: this._value, from: authorized}).should.be.fulfilled;
+        await this.crowdsale.buyTokens(authorized, { value: this._value, from: authorized }).should.be.fulfilled;
         await this.crowdsale.buyTokens(anotherAuthorized, {
           value: this._value,
-          from: authorized
+          from: authorized,
         }).should.be.rejected;
       });
     });
@@ -254,7 +250,6 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
       });
     });
   });
-
 
   describe('softCap handling', function () {
     it('should deny refunds before end', async function () {

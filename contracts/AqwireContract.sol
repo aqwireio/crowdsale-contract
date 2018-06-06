@@ -3,7 +3,6 @@ pragma solidity ^0.4.23;
 import "./AqwireToken.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/distribution/RefundableCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
-import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/emission/AllowanceCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsale.sol";
@@ -21,7 +20,6 @@ contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, Pausable, Allow
     * @param _softCap Funding goal
     * @param _tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
     */
-
 
     constructor(
         uint256 _openingTime,
@@ -82,7 +80,6 @@ contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, Pausable, Allow
     }
 
     function _getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
-        //uint256 elapsedTime = block.timestamp.sub(startTime);
 
         if (now < firstTimeBonusChange) {
             return _weiAmount.mul(firstBonus);
