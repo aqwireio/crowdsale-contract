@@ -1,10 +1,10 @@
 pragma solidity ^0.4.23;
 
-import "../node_modules/openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
+import "../node_modules/openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Whitelist.sol";
 
 
-contract AqwireToken is StandardToken, Whitelist {
+contract AqwireToken is StandardBurnableToken, Whitelist {
     string public constant name = "AqwireToken"; 
     string public constant symbol = "QEY"; 
     uint8 public constant decimals = 18; 
