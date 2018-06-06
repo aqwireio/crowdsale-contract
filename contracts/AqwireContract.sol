@@ -3,10 +3,10 @@ pragma solidity ^0.4.23;
 import "./AqwireToken.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/distribution/RefundableCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
+import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/emission/AllowanceCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsale.sol";
-import "../node_modules/openzeppelin-solidity/contracts/crowdsale/price/IncreasingPriceCrowdsale.sol";
 
 
 contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, Pausable, AllowanceCrowdsale, WhitelistedCrowdsale {
@@ -16,8 +16,8 @@ contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, Pausable, Allow
     * @param _wallet Address where collected funds will be forwarded to
     * @param _token Address of the token being sold
     * @param _openingTime Crowdsale opening time
-    * @param _closingTime Crowdsale closing time
-    * @param _hardCap Max amount of wei to be contributed
+    * @param _closingTime Crowdsale closing time 
+    * @param _hardCap Max amount of wei to be contributed 
     * @param _softCap Funding goal
     * @param _tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
     */
@@ -82,17 +82,17 @@ contract AqwireContract is RefundableCrowdsale, CappedCrowdsale, Pausable, Allow
     }
 
     function _getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
-        uint256 elapsedTime = block.timestamp.sub(startTime);
+        //uint256 elapsedTime = block.timestamp.sub(startTime);
 
-        if (elapsedTime > secondTimeBonusChange) {
-            return _weiAmount.mul(finalRate);
+        if (now < firstTimeBonusChange) {
+            return _weiAmount.mul(firstBonus);
         }
 
-        if (elapsedTime > firstTimeBonusChange) {
+        if (now < secondTimeBonusChange) {
             return _weiAmount.mul(secondBonus);
         }
 
-        return _weiAmount.mul(firstBonus);
+        return _weiAmount.mul(finalRate);
     }
 
 }

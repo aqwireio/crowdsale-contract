@@ -99,7 +99,8 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
       console.log('test authorized', authorized);
       console.log('test unauthorized', unauthorized);
       console.log('test anotherAuthorized', anotherAuthorized);
-
+      console.log('test firstTimeBonusChange', this.firstTimeBonusChange + duration.seconds(1000));
+      console.log('test secondTimeBonusChange', this.secondTimeBonusChange + duration.seconds(1000));
     });
     
     it('should not accept payments before start', async function () {
@@ -134,7 +135,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     });
 
     it('should assign tokens to sender and have Second Bonus', async function () {
-      await increaseTimeTo(this.firstTimeBonusChange + duration.seconds(10));
+      await increaseTimeTo(this.firstTimeBonusChange + duration.seconds(1000));
       const balanceBuyerBefore = await this.token.balanceOf(investor);
 
       await this.crowdsale.sendTransaction(
@@ -146,6 +147,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
 
     it('should assign tokens to sender and have Final Rate', async function () {
       await increaseTimeTo(this.secondTimeBonusChange + duration.seconds(10));
+      console.log(this.firstTimeBonusChange + duration.seconds(10));
       const balanceBuyerBefore = await this.token.balanceOf(investor);
 
       await this.crowdsale.sendTransaction(
