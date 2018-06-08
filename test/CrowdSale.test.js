@@ -24,6 +24,8 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
   const _lessThanHardCap = ether(4);
   const _softCap = ether(3);
   const _lessThanSoftCap = ether(2);
+  const _minCap = ether(0.5);
+  const _lessThanMinCap = ether(0.1);
   
   before(async function () {
     // Advance to the next block to correctly read time in the solidity "now" function interpreted by testrpc
@@ -109,7 +111,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     });
     
     it('should remove funds from buyer', async function () {
-      await this.crowdsale.setUserCap(investor, this._value2);
+      await this.crowdsale.setUserCap(investor, this._value2, _minCap);
       await increaseTimeTo(this.startTime);
       const walletBuyerBefore = web3.eth.getBalance(investor);
       const receipt = await this.crowdsale.sendTransaction(
@@ -126,7 +128,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     });
 
     it('should assign tokens to sender and have First Bonus', async function () {
-      await this.crowdsale.setUserCap(investor, this._value2);
+      await this.crowdsale.setUserCap(investor, this._value2, _minCap);
       await increaseTimeTo(this.startTime);
       const balanceBuyerBefore = await this.token.balanceOf(investor);
 
@@ -138,7 +140,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     });
 
     it('should assign tokens to sender and have Second Bonus', async function () {
-      await this.crowdsale.setUserCap(investor, this._value2);
+      await this.crowdsale.setUserCap(investor, this._value2, _minCap);
       await increaseTimeTo(this.firstTimeBonusChange + duration.seconds(1000));
       const balanceBuyerBefore = await this.token.balanceOf(investor);
 
@@ -150,7 +152,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     });
 
     it('should assign tokens to sender and have Final Rate', async function () {
-      await this.crowdsale.setUserCap(investor, this._value2);
+      await this.crowdsale.setUserCap(investor, this._value2, _minCap);
       await increaseTimeTo(this.secondTimeBonusChange + duration.seconds(10));
       const balanceBuyerBefore = await this.token.balanceOf(investor);
 
@@ -184,15 +186,15 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
 
     describe('accepting payments', function () {
       it('should accept payments to whitelisted (from whichever buyers)', async function () {
-        await this.crowdsale.setUserCap(authorized, this._value2);
-        await this.crowdsale.setUserCap(unauthorized, this._value2);
+        await this.crowdsale.setUserCap(authorized, this._value2, _minCap);
+        await this.crowdsale.setUserCap(unauthorized, this._value2, _minCap);
         await this.crowdsale.buyTokens(authorized, { value: this._value, from: authorized }).should.be.fulfilled;
         await this.crowdsale.buyTokens(authorized, { value: this._value, from: unauthorized }).should.be.fulfilled;
       });
 
       it('should reject payments to not whitelisted (from whichever buyers)', async function () {
-        await this.crowdsale.setUserCap(authorized, this._value2);
-        await this.crowdsale.setUserCap(unauthorized, this._value2);
+        await this.crowdsale.setUserCap(authorized, this._value2, _minCap);
+        await this.crowdsale.setUserCap(unauthorized, this._value2, _minCap);
         await this.crowdsale.send({ value: this._value, from: unauthorized }).should.be.rejected;
 
         await this.crowdsale.buyTokens(unauthorized, { value: this._value, from: unauthorized }).should.be.rejected;
@@ -200,7 +202,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
       });
 
       it('should reject payments to addresses removed from whitelist', async function () {
-        await this.crowdsale.setUserCap(authorized, this._value2);
+        await this.crowdsale.setUserCap(authorized, this._value2, _minCap);
         await this.crowdsale.removeFromWhitelist(authorized);
         await this.crowdsale.buyTokens(authorized, { value: this._value, from: authorized }).should.be.rejected;
       });
@@ -218,9 +220,9 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
 
     describe('accepting payments', function () {
       it('should accept payments to whitelisted (from whichever buyers)', async function () {
-        await this.crowdsale.setUserCap(authorized, this._value2);
-        await this.crowdsale.setUserCap(unauthorized, this._value2);
-        await this.crowdsale.setUserCap(anotherAuthorized, this._value2);
+        await this.crowdsale.setUserCap(authorized, this._value2, _minCap);
+        await this.crowdsale.setUserCap(unauthorized, this._value2, _minCap);
+        await this.crowdsale.setUserCap(anotherAuthorized, this._value2, _minCap);
         await this.crowdsale.buyTokens(authorized, { value: this._value, from: authorized }).should.be.fulfilled;
         await this.crowdsale.buyTokens(authorized, { value: this._value, from: unauthorized }).should.be.fulfilled;
         await this.crowdsale.buyTokens(anotherAuthorized, {
@@ -234,8 +236,8 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
       });
 
       it('should reject payments to not whitelisted (with whichever buyers)', async function () {
-        await this.crowdsale.setUserCap(authorized, this._value2);
-        await this.crowdsale.setUserCap(unauthorized, this._value2);
+        await this.crowdsale.setUserCap(authorized, this._value2, _minCap);
+        await this.crowdsale.setUserCap(unauthorized, this._value2, _minCap);
         await this.crowdsale.send({ value: this._value, from: unauthorized }).should.be.rejected;
 
         await this.crowdsale.buyTokens(unauthorized, { value: this._value, from: unauthorized }).should.be.rejected;
@@ -243,8 +245,8 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
       });
 
       it('should reject payments to addresses removed from whitelist', async function () {
-        await this.crowdsale.setUserCap(authorized, this._value2);
-        await this.crowdsale.setUserCap(anotherAuthorized, this._value2);
+        await this.crowdsale.setUserCap(authorized, this._value2, _minCap);
+        await this.crowdsale.setUserCap(anotherAuthorized, this._value2, _minCap);
         await this.crowdsale.removeFromWhitelist(anotherAuthorized);
         await this.crowdsale.buyTokens(authorized, { value: this._value, from: authorized }).should.be.fulfilled;
         await this.crowdsale.buyTokens(anotherAuthorized, {
@@ -276,7 +278,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     });
 
     it('should deny refunds after end if goal was reached', async function () {
-      await this.crowdsale.setUserCap(investor, _lessThanHardCap);
+      await this.crowdsale.setUserCap(investor, _lessThanHardCap, _minCap);
       await increaseTimeTo(this.startTime);
       await this.crowdsale.sendTransaction({ value: _softCap, from: investor });
       await increaseTimeTo(this.afterEndTime);
@@ -284,7 +286,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     });
 
     it('should allow refunds after end if goal was not reached', async function () {
-      await this.crowdsale.setUserCap(investor, _lessThanHardCap);
+      await this.crowdsale.setUserCap(investor, _lessThanHardCap, _minCap);
       await increaseTimeTo(this.startTime);
       await this.crowdsale.sendTransaction({ value: _lessThanSoftCap, from: investor });
       await increaseTimeTo(this.afterEndTime);
@@ -297,7 +299,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     });
 
     it('should forward funds to wallet after end if goal was reached', async function () {
-      await this.crowdsale.setUserCap(investor, _lessThanHardCap);
+      await this.crowdsale.setUserCap(investor, _lessThanHardCap, _minCap);
       await increaseTimeTo(this.startTime);
       await this.crowdsale.sendTransaction({ value: _softCap, from: investor });
       await increaseTimeTo(this.afterEndTime);
@@ -315,20 +317,20 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
 
     describe('accepting payments', function () {
       it('should accept payments within cap', async function () {
-        await this.crowdsale.setUserCap(investor, _moreThanhardCap);
+        await this.crowdsale.setUserCap(investor, _moreThanhardCap, _minCap);
         let amount = _hardCap.minus(_lessThanHardCap);
         await this.crowdsale.sendTransaction({ value: amount, from: investor }).should.be.fulfilled;
         await this.crowdsale.sendTransaction({ value: _lessThanHardCap, from: investor }).should.be.fulfilled;
       });
   
       it('should reject payments outside cap', async function () {
-        await this.crowdsale.setUserCap(investor, _moreThanhardCap);
+        await this.crowdsale.setUserCap(investor, _moreThanhardCap, _minCap);
         await this.crowdsale.sendTransaction({ value: _hardCap, from: investor });
         await this.crowdsale.sendTransaction({ value: 1, from: investor }).should.be.rejectedWith(EVMRevert);
       });
   
       it('should reject payments that exceed cap', async function () {
-        await this.crowdsale.setUserCap(investor, _moreThanhardCap);
+        await this.crowdsale.setUserCap(investor, _moreThanhardCap, _minCap);
         let amount = _hardCap.add(1);
         await this.crowdsale.sendTransaction({ value: amount, from: investor }).should.be.rejectedWith(EVMRevert);
       });
@@ -336,7 +338,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
 
     describe('ending', function () {
       it('should not reach cap if sent under cap', async function () {
-        await this.crowdsale.setUserCap(investor, _moreThanhardCap);
+        await this.crowdsale.setUserCap(investor, _moreThanhardCap, _minCap);
         let capReached = await this.crowdsale.capReached();
         capReached.should.equal(false);
         await this.crowdsale.sendTransaction({ value: _lessThanHardCap, from: investor });
@@ -345,7 +347,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
       });
   
       it('should not reach cap if sent just under cap', async function () {
-        await this.crowdsale.setUserCap(investor, _moreThanhardCap);
+        await this.crowdsale.setUserCap(investor, _moreThanhardCap, _minCap);
         let amount = _hardCap.minus(1);
         await this.crowdsale.sendTransaction({ value: amount, from: investor });
         let capReached = await this.crowdsale.capReached();
@@ -353,26 +355,43 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
       });
   
       it('should reach cap if cap sent', async function () {
-        await this.crowdsale.setUserCap(investor, _moreThanhardCap);
+        await this.crowdsale.setUserCap(investor, _moreThanhardCap, _minCap);
         await this.crowdsale.sendTransaction({ value: _hardCap, from: investor });
         let capReached = await this.crowdsale.capReached();
         capReached.should.equal(true);
       });
     });
 
-    describe('Individual contribution cap', function () {
-      it('should fail if below limit', async function () {
-        await this.crowdsale.setUserCap(investor, this._value);
+    describe('Individual max contribution cap', function () {
+      it('should fail if below max limit', async function () {
+        await this.crowdsale.setUserCap(investor, this._value, _minCap);
         await this.crowdsale.sendTransaction({ from: investor, to: this.crowdsale.address, value: this._value2 }).should.be.rejectedWith(EVMRevert);
       });
 
       it('should allow if exactly max limit', async function () {
-        await this.crowdsale.setUserCap(investor, this._value2);
+        await this.crowdsale.setUserCap(investor, this._value2, _minCap);
         await this.crowdsale.sendTransaction({ from: investor, to: this.crowdsale.address, value: this._value2 }).should.be.fulfilled;
       });
 
       it('should allow if less than max limit', async function () {
-        await this.crowdsale.setUserCap(investor, this._value2);
+        await this.crowdsale.setUserCap(investor, this._value2, _minCap);
+        await this.crowdsale.sendTransaction({ from: investor, to: this.crowdsale.address, value: this._value }).should.be.fulfilled;
+      });
+    });
+
+    describe('Individual min contribution cap', function () {
+      it('should fail if below min limit', async function () {
+        await this.crowdsale.setUserCap(investor, this._value, _minCap);
+        await this.crowdsale.sendTransaction({ from: investor, to: this.crowdsale.address, value: _lessThanMinCap }).should.be.rejectedWith(EVMRevert);
+      });
+
+      it('should allow if exactly min limit', async function () {
+        await this.crowdsale.setUserCap(investor, this._value2, _minCap);
+        await this.crowdsale.sendTransaction({ from: investor, to: this.crowdsale.address, value: _minCap }).should.be.fulfilled;
+      });
+
+      it('should allow if more than min limit', async function () {
+        await this.crowdsale.setUserCap(investor, this._value2, _minCap);
         await this.crowdsale.sendTransaction({ from: investor, to: this.crowdsale.address, value: this._value }).should.be.fulfilled;
       });
     });

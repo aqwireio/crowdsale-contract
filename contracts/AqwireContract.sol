@@ -6,7 +6,7 @@ import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/Cap
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/emission/AllowanceCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsale.sol";
-import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/IndividuallyCappedCrowdsale.sol";
+import "./IndividuallyCappedCrowdsale.sol";
 
 contract AqwireContract is CappedCrowdsale, AllowanceCrowdsale, RefundableCrowdsale, IndividuallyCappedCrowdsale, Pausable, WhitelistedCrowdsale {
 
