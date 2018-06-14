@@ -5,12 +5,12 @@ import "../node_modules/openzeppelin-solidity/contracts/ownership/Whitelist.sol"
 
 
 contract AqwireToken is StandardBurnableToken, Whitelist {
-    string public constant name = "AqwireToken"; 
+    string public constant name = "Aqwire Token"; 
     string public constant symbol = "QEY"; 
     uint8 public constant decimals = 18; 
 
-    uint256 public constant INITIAL_SUPPLY = 180000000 * (10 ** uint256(decimals));
-    uint256 public constant unlockTime = now.add(4 weeks);
+    uint256 public constant INITIAL_SUPPLY = 250000000 * (10 ** uint256(decimals));
+    uint256 public constant unlockTime = now.add(6 weeks);
 
     constructor() public{
         totalSupply_ = INITIAL_SUPPLY;

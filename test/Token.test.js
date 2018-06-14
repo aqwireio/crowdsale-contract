@@ -18,10 +18,10 @@ contract('AqwireToken', accounts => {
   var _owner = accounts[0];
   var _receiver = accounts[1];
   
-  const _name = 'AqwireToken';
+  const _name = 'Aqwire Token';
   const _symbol = 'QEY';
   const _decimals = 18;
-  const _totalSupply = 180000000 * 1e+18;
+  const _totalSupply = 250000000 * 1e+18;
   
   beforeEach('setup contract for each test', async function () {
     aqwireToken = await AqwireToken.new({ from: _owner });
