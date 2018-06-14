@@ -20,16 +20,33 @@ module.exports = async function (deployer, network, accounts) {
   // tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
   const tokenWallet = accounts[0];
 
-  const rate = new web3.BigNumber(100);
-  const openingTime = Date.now() / 1000 | 0 + 1000;
-  const closingTime = openingTime + duration.weeks(4);
-  const hardCap = 300 * (10 ** 18);
-  const softCap = 2 * (10 ** 18);
-  console.log(openingTime, closingTime, rate, wallet, hardCap, tokenWallet, softCap);
+  const multisigWallet = '0xBe91BB57BD54f9Ac75472E7f6556563960297548';
 
-  const firstBonus = new web3.BigNumber(110);
-  const secondBonus = new web3.BigNumber(105);
-  const finalRate = rate;
+  const startDate = 'Sun Jul 1 2018 18:30:00 GMT+0800';
+  const ethUSD = 489.40;
+  const qeyUSD = 0.15;
+
+  const ethToQeyRate = new web3.BigNumber((ethUSD / qeyUSD).toString());
+
+  const openingTime = new Date(startDate).getTime() / 1000 | 0 + 1000;
+  const closingTime = openingTime + duration.weeks(6);
+
+  const hardCapInUSD = 15000000;
+  const soldPrivateSaleETH = 1000;
+  const soldPrivateSaleUSD = soldPrivateSaleETH * ethUSD;
+  const soldPrivateSaleQEY = soldPrivateSaleETH * ethToQeyRate;
+  const hardCapRemainUSD = hardCapInUSD - soldPrivateSaleUSD;
+  const softCapInUSD = 3000000;
+  const hardCapInEth = new web3.BigNumber((hardCapRemainUSD / ethUSD).toString()).toNumber();
+  const hardCapInWei = hardCapInEth * (10 ** 18);
+  const softCapInEth = new web3.BigNumber((softCapInUSD / ethUSD).toString()).toNumber();
+  const softCapInWei = softCapInEth * (10 ** 18);
+
+  console.log(openingTime, closingTime, ethToQeyRate, wallet, hardCapInWei, tokenWallet, softCapInWei);
+
+  const firstBonus = ethToQeyRate.mul(1.10);
+  const secondBonus = ethToQeyRate.mul(1.05);
+  const finalRate = ethToQeyRate;
 
   const startTime = openingTime;
   const firstTimeBonusChange = openingTime + duration.weeks(1);
@@ -43,11 +60,11 @@ module.exports = async function (deployer, network, accounts) {
       AqwireContract,
       openingTime,
       closingTime,
-      rate,
+      ethToQeyRate,
       wallet,
-      hardCap,
+      hardCapInWei,
       tokenWallet,
-      softCap,
+      softCapInWei,
       AqwireToken.address,
       { from: owner }
     ).then(async function () {
@@ -59,9 +76,12 @@ module.exports = async function (deployer, network, accounts) {
       await CoinInstance.setUnlockTime(closingTime, { from: owner });
       // setup Bonus rates
       await ContractInstance.setCurrentRate(firstBonus, secondBonus, finalRate, startTime, firstTimeBonusChange, secondTimeBonusChange);
-      
+
       // await CoinInstance.transfer(tokenWallet, totalSupply, { from: owner });
       await CoinInstance.approve(crowdsaleAddress, totalSupply, { from: tokenWallet });
+
+      // send sold qey during prsale to multisig
+      await CoinInstance.transfer(multisigWallet, soldPrivateSaleQEY, { from: owner });
     });
   });
 };
