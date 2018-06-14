@@ -56,7 +56,7 @@ module.exports = async function (deployer, network, accounts) {
       const ContractInstance = AqwireContract.at(crowdsaleAddress);
       const totalSupply = await CoinInstance.totalSupply({ from: owner });
       await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
-      
+      await CoinInstance.setUnlockTime(closingTime, { from: owner });
       // setup Bonus rates
       await ContractInstance.setCurrentRate(firstBonus, secondBonus, finalRate, startTime, firstTimeBonusChange, secondTimeBonusChange);
       

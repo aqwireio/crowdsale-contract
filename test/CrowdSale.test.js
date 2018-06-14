@@ -16,7 +16,7 @@ const AqwireContract = artifacts.require('./AqwireContract.sol');
 const AqwireToken = artifacts.require('./AqwireToken.sol');
 
 contract('AqwireContract', function ([owner, wallet, investor, purchaser, authorized, unauthorized, anotherAuthorized]) {
-  const RATE = new BigNumber(100);
+  const RATE = new BigNumber(99);
   const GOAL = ether(3);
   const CAP = ether(5);
   const _moreThanhardCap = ether(7);
@@ -34,14 +34,15 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
 
   beforeEach(async function () {
     this.startTime = latestTime() + duration.weeks(1);
+    this.beforeEndTime = this.startTime + duration.weeks(3);
     this.endTime = this.startTime + duration.weeks(4);
-    this.afterEndTime = this.endTime + duration.seconds(10);
+    this.afterEndTime = this.endTime + duration.weeks(5);
     this._value = ether(1);
     this._value2 = ether(2);
     this.tokens = RATE.mul(this._value);
 
-    this.firstBonus = new web3.BigNumber(110);
-    this.secondBonus = new web3.BigNumber(105);
+    this.firstBonus = new web3.BigNumber(129);
+    this.secondBonus = new web3.BigNumber(119);
     this.finalRate = RATE;
   
     this.firstTimeBonusChange = this.startTime + duration.weeks(1);
@@ -64,6 +65,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     const crowdsaleAddress = this.crowdsale.address;
     const totalSupply = await CoinInstance.totalSupply({ from: owner });
     await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
+    await CoinInstance.setUnlockTime(this.endTime, { from: owner });
     // await CoinInstance.transfer(owner, totalSupply, { from: owner });
 
     // setup Bonus rates
@@ -170,9 +172,47 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     });
 
     it('reverts when trying to buy tokens when contract is end', async function () {
-      await increaseTimeTo(this.afterEnd);
+      await increaseTimeTo(this.afterEndTime);
       await assertRevert(this.crowdsale.sendTransaction(
         { from: investor, to: this.crowdsale.address, value: ether(1) }));
+    });
+  });
+
+  describe('Unlock tokens', function () {
+    it('reverts when trying to send tokens when crowdsale is not finished', async function () {
+      await this.crowdsale.setUserCap(investor, this._value2, _minCap);
+      await increaseTimeTo(this.startTime);
+
+      await this.crowdsale.sendTransaction(
+        { from: investor, to: this.crowdsale.address, value: this._value });
+
+      const balanceBuyerAfter = await this.token.balanceOf(investor);
+      await this.token.transfer(authorized, balanceBuyerAfter, { from: investor }).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('should assign when trying to send tokens when crowdsale is finished', async function () {
+      await this.crowdsale.setUserCap(investor, this._value2, _minCap);
+      await increaseTimeTo(this.beforeEndTime);
+
+      await this.crowdsale.sendTransaction(
+        { from: investor, to: this.crowdsale.address, value: this._value });
+
+      const balanceBuyerAfter = await this.token.balanceOf(investor);
+      await increaseTimeTo(this.afterEndTime); // force time to move after unlock
+      await this.token.transfer(authorized, balanceBuyerAfter, { from: investor }).should.be.fulfilled;
+    });
+
+    it('should assign when trying to send tokens when user is whitelisted', async function () {
+      await this.crowdsale.setUserCap(investor, this._value2, _minCap);
+      await increaseTimeTo(this.startTime);
+
+      await this.crowdsale.sendTransaction(
+        { from: investor, to: this.crowdsale.address, value: this._value });
+
+      const balanceBuyerAfter = await this.token.balanceOf(investor);
+      await this.token.addAddressToWhitelist(investor);
+      const unlockTime = await this.token.unlockTime();
+      await this.token.transfer(authorized, balanceBuyerAfter, { from: investor }).should.be.fulfilled;
     });
   });
 
@@ -395,6 +435,5 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
         await this.crowdsale.sendTransaction({ from: investor, to: this.crowdsale.address, value: this._value }).should.be.fulfilled;
       });
     });
-
   });
 });
