@@ -26,6 +26,8 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
   const _lessThanSoftCap = ether(2);
   const _minCap = ether(0.5);
   const _lessThanMinCap = ether(0.1);
+  const soldPrivateSaleQEY = 1000 * 10 ** 18;
+  const multisigWallet = '0xBe91BB57BD54f9Ac75472E7f6556563960297548';
   
   before(async function () {
     // Advance to the next block to correctly read time in the solidity "now" function interpreted by testrpc
@@ -77,6 +79,8 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     await this.crowdsale.addToWhitelist(authorized);
 
     await CoinInstance.approve(crowdsaleAddress, totalSupply);
+    await CoinInstance.transfer(multisigWallet, soldPrivateSaleQEY, { from: owner });
+
   });
 
   describe('buying tokens', function () {
@@ -110,6 +114,11 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
       await this.crowdsale.sendTransaction({ from: investor, to: this.crowdsale.address, value: this._value }).should.be.rejectedWith(EVMRevert);
     });
     
+    // need to get this test passing
+    it('Transfer tokens to multisigWallet for tokens sold at private sale', async function () {
+      assert((new BigNumber(10).pow(18)).mul(soldPrivateSaleQEY).equals(await this.token.balanceOf(multisigWallet)), 'multisigwallet balance for private investors');
+    });
+
     it('should remove funds from buyer', async function () {
       await this.crowdsale.setUserCap(investor, this._value2, _minCap);
       await increaseTimeTo(this.startTime);
