@@ -82,7 +82,7 @@ $ npm run migrate:testnet
 # Contributors
 
 * Andrey Shishkin <motive.do@gmail.com>
-* Scott Yu <scott@qwikwire.com>
+* Scott Yu <scott@aqwire.io>
 
 
    [truffle]: <http://truffleframework.com/>

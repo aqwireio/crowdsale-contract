@@ -26,7 +26,7 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
   const _lessThanSoftCap = ether(2);
   const _minCap = ether(0.5);
   const _lessThanMinCap = ether(0.1);
-  const soldPrivateSaleQEY = 1000 * 10 ** 18;
+  const soldPrivateSaleQEY = RATE.mul(1000);
   const multisigWallet = '0xBe91BB57BD54f9Ac75472E7f6556563960297548';
   
   before(async function () {
@@ -82,7 +82,6 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
 
     await CoinInstance.approve(crowdsaleAddress, totalSupply);
     await CoinInstance.transfer(multisigWallet, soldPrivateSaleQEY, { from: owner });
-
   });
 
   describe('buying tokens', function () {
@@ -116,9 +115,9 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
       await this.crowdsale.sendTransaction({ from: investor, to: this.crowdsale.address, value: this._value }).should.be.rejectedWith(EVMRevert);
     });
     
-    // need to get this test passing
-    it('Transfer tokens to multisigWallet for tokens sold at private sale', async function () {
-      assert((new BigNumber(10).pow(18)).mul(soldPrivateSaleQEY).equals(await this.token.balanceOf(multisigWallet)), 'multisigwallet balance for private investors');
+    it('transfer tokens to multisigWallet for tokens sold at private sale', async function () {
+      const multisigQeyBalance = await this.token.balanceOf(multisigWallet);
+      soldPrivateSaleQEY.should.be.bignumber.equal(multisigQeyBalance);
     });
 
     it('should remove funds from buyer', async function () {
