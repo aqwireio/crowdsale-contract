@@ -33,7 +33,11 @@ module.exports = {
             port: 7545,
             network_id: "*" // Match any network id
         }
-    }
+    },
+    authors: [
+        "Andrey Shishkin <motive.do@gmail.com>",
+        "Scott Yu <scott@aqwire.io>"
+    ]
 };
 
 

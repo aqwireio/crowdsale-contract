@@ -11,16 +11,16 @@ const duration = {
 };
 
 module.exports = async function (deployer, network, accounts) {
+  const multisigWallet = '0xBe91BB57BD54f9Ac75472E7f6556563960297548';
+
   // owner of the crowdsale
   const owner = accounts[0];
     
-  // wallet where the ehter will get deposited
+  // wallet address where collected eth will be forwarded to
   const wallet = accounts[1]; // Develop
     
   // tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
   const tokenWallet = accounts[0];
-
-  const multisigWallet = '0xBe91BB57BD54f9Ac75472E7f6556563960297548';
 
   const startDate = 'Sun Jul 1 2018 18:30:00 GMT+0800';
   const ethUSD = 489.40;
