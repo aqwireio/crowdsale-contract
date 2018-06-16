@@ -15,19 +15,59 @@ require('chai')
 const AqwireContract = artifacts.require('./AqwireContract.sol');
 const AqwireToken = artifacts.require('./AqwireToken.sol');
 
-contract('AqwireContract', function ([owner, wallet, investor, purchaser, authorized, unauthorized, anotherAuthorized]) {
-  const RATE = new BigNumber(99);
-  const GOAL = ether(3);
-  const CAP = ether(5);
-  const _moreThanhardCap = ether(7);
-  const _hardCap = ether(5);
-  const _lessThanHardCap = ether(4);
-  const _softCap = ether(3);
-  const _lessThanSoftCap = ether(2);
-  const _minCap = ether(0.5);
-  const _lessThanMinCap = ether(0.1);
-  const soldPrivateSaleQEY = RATE.mul(1000);
-  const multisigWallet = '0xBe91BB57BD54f9Ac75472E7f6556563960297548';
+contract('AqwireContract', function (accounts) {
+  // ==== accounts setup ====
+
+  // owner of the crowdsale
+  const owner = accounts[0];
+  // wallet address where collected eth will be forwarded to
+  const wallet = accounts[1]; // Develop
+  // multisig wallet address
+  const multisigWallet = accounts[2];
+  // tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
+  const tokenWallet = accounts[3];
+
+  const investor = accounts[4];
+  const purchaser = accounts[5];
+  const authorized = accounts[6];
+  const unauthorized = accounts[7];
+  const anotherAuthorized = accounts[8];
+  
+  // ==== variables setup =====
+
+  const startDate = 'Sun Jul 1 2018 18:30:00 GMT+0800';
+  const openingTime = new Date(startDate).getTime() / 1000;
+  const closingTime = openingTime + duration.weeks(6);
+
+  const ethUSD = 550; // abitrary rate for testing
+  const qeyUSD = 0.15; // $0.15 per QEY
+  const ethToQeyRate = new web3.BigNumber((ethUSD / qeyUSD).toFixed(0));
+
+  const hardCapInUSD = 15000000;
+  const soldPrivateSaleETH = 10000;
+  const soldPrivateSaleUSD = soldPrivateSaleETH * ethUSD;
+  const hardCapRemainUSD = hardCapInUSD - soldPrivateSaleUSD;
+  const softCapInUSD = 3000000;
+  const hardCapInEth = new web3.BigNumber((hardCapRemainUSD / ethUSD).toFixed(0));
+  const hardCapInWei = (new web3.BigNumber(10).pow(18)).mul(hardCapInEth); // maximum amount of wei accepted in the crowdsale
+  const softCapInEth = new web3.BigNumber((softCapInUSD / ethUSD).toFixed(0));
+  const softCapInWei = (new web3.BigNumber(10).pow(18)).mul(softCapInEth); // minimum amount of funds to be raised in weis
+
+  const minCapPerAddress = ether(0.1);
+  const maxCapPerAddress = ether(500);
+
+  const RATE = ethToQeyRate;
+  const GOAL = softCapInWei;
+  const CAP = hardCapInWei;
+  const _moreThanhardCap = CAP.add(ether(1));
+  const _hardCap = CAP;
+  const _lessThanHardCap = CAP.sub(ether(1));
+  const _moreThanSoftCap = GOAL.add(ether(1));
+  const _softCap = GOAL;
+  const _lessThanSoftCap = GOAL.add(ether(1));
+  const _minCap = ether(0.1);
+  const _lessThanMinCap = _minCap.sub(ether(0.05));
+  const soldPrivateSaleQEY = RATE.mul(soldPrivateSaleETH).round(0);
   
   before(async function () {
     // Advance to the next block to correctly read time in the solidity "now" function interpreted by testrpc
@@ -35,16 +75,15 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
   });
 
   beforeEach(async function () {
-    this.startTime = latestTime() + duration.weeks(1);
-    this.beforeEndTime = this.startTime + duration.weeks(3);
-    this.endTime = this.startTime + duration.weeks(4);
-    this.afterEndTime = this.endTime + duration.weeks(5);
+    this.startTime = latestTime() + duration.minutes(1);
+    this.endTime = this.startTime + duration.weeks(6);
+    this.beforeEndTime = this.endTime - duration.weeks(1);
+    this.afterEndTime = this.endTime + duration.weeks(1);
     this._value = ether(1);
     this._value2 = ether(2);
-    this.tokens = RATE.mul(this._value);
 
-    this.firstBonus = new web3.BigNumber(129);
-    this.secondBonus = new web3.BigNumber(119);
+    this.firstBonus = RATE.mul(1.10).round(0); //since we're dealing with wei <> qeybits
+    this.secondBonus = RATE.mul(1.05).round(0);
     this.finalRate = RATE;
   
     this.firstTimeBonusChange = this.startTime + duration.weeks(1);
@@ -68,17 +107,17 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     const totalSupply = await CoinInstance.totalSupply({ from: owner });
     await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
     await CoinInstance.setUnlockTime(this.endTime, { from: owner });
-    // await CoinInstance.transfer(owner, totalSupply, { from: owner });
 
     // setup Bonus rates
     await this.crowdsale.setCurrentRate(this.firstBonus, this.secondBonus, this.finalRate, this.startTime, this.firstTimeBonusChange, this.secondTimeBonusChange);
     
+    const whitelistedAddresses = [owner, investor, wallet, purchaser, authorized];
+
     // approve so they can invest in crowdsale
-    await this.crowdsale.addToWhitelist(owner);
-    await this.crowdsale.addToWhitelist(investor);
-    await this.crowdsale.addToWhitelist(wallet);
-    await this.crowdsale.addToWhitelist(purchaser);
-    await this.crowdsale.addToWhitelist(authorized);
+    await this.crowdsale.addManyToWhitelist(whitelistedAddresses);
+
+    // set contribution cap for addresses
+    await this.crowdsale.setGroupCap(whitelistedAddresses, maxCapPerAddress, minCapPerAddress);
 
     await CoinInstance.approve(crowdsaleAddress, totalSupply);
     await CoinInstance.transfer(multisigWallet, soldPrivateSaleQEY, { from: owner });
@@ -99,16 +138,22 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
       goal.should.be.bignumber.equal(GOAL);
       cap.should.be.bignumber.equal(CAP);
 
-      console.log('Crowdsale Owner', await this.crowdsale.owner());
-      console.log('test owner', owner);
-      console.log('test investor', investor);
-      console.log('test wallet', wallet);
-      console.log('test purchaser', purchaser);
-      console.log('test authorized', authorized);
-      console.log('test unauthorized', unauthorized);
-      console.log('test anotherAuthorized', anotherAuthorized);
-      console.log('test firstTimeBonusChange', this.firstTimeBonusChange + duration.seconds(1000));
-      console.log('test secondTimeBonusChange', this.secondTimeBonusChange + duration.seconds(1000));
+      console.info('======================== VARIABLES ========================');
+      console.info('Crowdsale Owner', await this.crowdsale.owner());
+      console.info('owner', owner);
+      console.info('investor', investor);
+      console.info('wallet', wallet);
+      console.info('purchaser', purchaser);
+      console.info('authorized', authorized);
+      console.info('unauthorized', unauthorized);
+      console.info('anotherAuthorized', anotherAuthorized);
+      console.info('startTime', this.startTime);
+      console.info('beforeEndTime', this.beforeEndTime);
+      console.info('firstTimeBonusChange', this.firstTimeBonusChange);
+      console.info('secondTimeBonusChange', this.secondTimeBonusChange);
+      console.info('endTime', this.endTime);
+      console.info('afterEndTime', this.afterEndTime);
+      console.info('======================== VARIABLES ========================');
     });
     
     it('should not accept payments before start', async function () {
@@ -326,24 +371,24 @@ contract('AqwireContract', function ([owner, wallet, investor, purchaser, author
     });
 
     it('should deny refunds after end if goal was reached', async function () {
-      await this.crowdsale.setUserCap(investor, _lessThanHardCap, _minCap);
+      await this.crowdsale.setUserCap(investor, _moreThanSoftCap, _minCap);
       await increaseTimeTo(this.startTime);
-      await this.crowdsale.sendTransaction({ value: _softCap, from: investor });
+      await this.crowdsale.sendTransaction({ value: _moreThanSoftCap, from: investor });
       await increaseTimeTo(this.afterEndTime);
       await this.crowdsale.claimRefund({ from: investor }).should.be.rejectedWith(EVMRevert);
     });
 
     it('should allow refunds after end if goal was not reached', async function () {
-      await this.crowdsale.setUserCap(investor, _lessThanHardCap, _minCap);
+      await this.crowdsale.setUserCap(investor, _moreThanSoftCap, _minCap);
       await increaseTimeTo(this.startTime);
-      await this.crowdsale.sendTransaction({ value: _lessThanSoftCap, from: investor });
+      await this.crowdsale.sendTransaction({ value: ether(100), from: investor });
       await increaseTimeTo(this.afterEndTime);
       await this.crowdsale.finalize({ from: owner });
       const pre = web3.eth.getBalance(investor);
       await this.crowdsale.claimRefund({ from: investor, gasPrice: 0 })
         .should.be.fulfilled;
       const post = web3.eth.getBalance(investor);
-      post.minus(pre).should.be.bignumber.equal(_lessThanSoftCap);
+      post.minus(pre).should.be.bignumber.equal(ether(100));
     });
 
     it('should forward funds to wallet after end if goal was reached', async function () {

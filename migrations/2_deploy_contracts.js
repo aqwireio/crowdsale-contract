@@ -11,7 +11,8 @@ const duration = {
 };
 
 module.exports = async function (deployer, network, accounts) {
-  const multisigWallet = '0xBe91BB57BD54f9Ac75472E7f6556563960297548';
+  // multisig wallet address
+  const multisigWallet = accounts[1];
 
   // owner of the crowdsale
   const owner = accounts[0];
@@ -23,12 +24,12 @@ module.exports = async function (deployer, network, accounts) {
   const tokenWallet = accounts[0];
 
   const startDate = 'Sun Jul 1 2018 18:30:00 GMT+0800';
-  const ethUSD = 489.40;
+  const ethUSD = 550;
   const qeyUSD = 0.15;
 
   const ethToQeyRate = new web3.BigNumber((ethUSD / qeyUSD).toString());
 
-  const openingTime = new Date(startDate).getTime() / 1000 | 0 + 1000;
+  const openingTime = new Date(startDate).getTime() / 1000;
   const closingTime = openingTime + duration.weeks(6);
 
   const hardCapInUSD = 15000000;
@@ -38,9 +39,9 @@ module.exports = async function (deployer, network, accounts) {
   const hardCapRemainUSD = hardCapInUSD - soldPrivateSaleUSD;
   const softCapInUSD = 3000000;
   const hardCapInEth = new web3.BigNumber((hardCapRemainUSD / ethUSD).toString()).toNumber();
-  const hardCapInWei = hardCapInEth * (10 ** 18);
+  const hardCapInWei = hardCapInEth * (10 ** 18); // maximum amount of wei accepted in the crowdsale
   const softCapInEth = new web3.BigNumber((softCapInUSD / ethUSD).toString()).toNumber();
-  const softCapInWei = softCapInEth * (10 ** 18);
+  const softCapInWei = softCapInEth * (10 ** 18); // minimum amount of funds to be raised in weis
 
   console.log(openingTime, closingTime, ethToQeyRate, wallet, hardCapInWei, tokenWallet, softCapInWei);
 
