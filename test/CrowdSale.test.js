@@ -45,6 +45,7 @@ contract('AqwireContract', function (accounts) {
 
   const hardCapInUSD = 15000000;
   const soldPrivateSaleETH = 10000;
+  const soldPrivateSaleQEY = ethToQeyRate.mul(soldPrivateSaleETH).round(0);
   const soldPrivateSaleUSD = soldPrivateSaleETH * ethUSD;
   const hardCapRemainUSD = hardCapInUSD - soldPrivateSaleUSD;
   const softCapInUSD = 3000000;
@@ -57,8 +58,8 @@ contract('AqwireContract', function (accounts) {
   const secondBonus = ethToQeyRate.mul(1.05).round(0);
   const finalRate = ethToQeyRate;
 
-  const minCapPerAddress = ether(0.1);
-  const maxCapPerAddress = ether(500);
+  const minCapPerAddress = new web3.BigNumber(web3.toWei(0.1, 'ether'));
+  const maxCapPerAddress = new web3.BigNumber(web3.toWei(500, 'ether'));
   // ===== end crowdsale variables =====
 
   // ===== Variables used for testing =====
@@ -73,7 +74,6 @@ contract('AqwireContract', function (accounts) {
   const _lessThanSoftCap = GOAL.add(ether(1));
   const _minCap = ether(0.1);
   const _lessThanMinCap = _minCap.sub(ether(0.05));
-  const soldPrivateSaleQEY = RATE.mul(soldPrivateSaleETH).round(0);
   
   before(async function () {
     // Advance to the next block to correctly read time in the solidity "now" function interpreted by testrpc

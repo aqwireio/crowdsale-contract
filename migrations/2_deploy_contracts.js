@@ -12,13 +12,13 @@ const duration = {
 
 module.exports = async function (deployer, network, accounts) {
   // multisig wallet address
-  const multisigWallet = accounts[1];
+  const multisigWallet = '0xddf00a7540a7b68fdca13705b5c83b685518b716';
 
   // owner of the crowdsale
   const owner = accounts[0];
     
   // wallet address where collected eth will be forwarded to
-  const wallet = accounts[1]; // Develop
+  const wallet = '0xddf00a7540a7b68fdca13705b5c83b685518b716'; // Develop
     
   // tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
   const tokenWallet = accounts[0];
@@ -36,6 +36,7 @@ module.exports = async function (deployer, network, accounts) {
 
   const hardCapInUSD = 15000000;
   const soldPrivateSaleETH = 10000;
+  const soldPrivateSaleQEY = ethToQeyRate.mul(soldPrivateSaleETH).round(0);
   const soldPrivateSaleUSD = soldPrivateSaleETH * ethUSD;
   const hardCapRemainUSD = hardCapInUSD - soldPrivateSaleUSD;
   const softCapInUSD = 3000000;
@@ -48,8 +49,8 @@ module.exports = async function (deployer, network, accounts) {
   const secondBonus = ethToQeyRate.mul(1.05).round(0);
   const finalRate = ethToQeyRate;
 
-  const minCapPerAddress = ether(0.1);
-  const maxCapPerAddress = ether(500);
+  const minCapPerAddress = new web3.BigNumber(web3.toWei(0.1, 'ether'));
+  const maxCapPerAddress = new web3.BigNumber(web3.toWei(500, 'ether'));
   // ===== end crowdsale variables =====
 
   console.log('=============Start Deploy============');
@@ -75,7 +76,7 @@ module.exports = async function (deployer, network, accounts) {
       await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
       await CoinInstance.setUnlockTime(closingTime, { from: owner });
       // setup Bonus rates
-      await ContractInstance.setCurrentRate(firstBonus, secondBonus, finalRate, startTime, firstTimeBonusChange, secondTimeBonusChange);
+      await ContractInstance.setCurrentRate(firstBonus, secondBonus, finalRate, openingTime, firstTimeBonusChange, secondTimeBonusChange);
 
       // await CoinInstance.transfer(tokenWallet, totalSupply, { from: owner });
       await CoinInstance.approve(crowdsaleAddress, totalSupply, { from: tokenWallet });
