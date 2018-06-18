@@ -23,35 +23,34 @@ module.exports = async function (deployer, network, accounts) {
   // tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
   const tokenWallet = accounts[0];
 
+  // ===== start crowdsale variables =====
   const startDate = 'Sun Jul 1 2018 18:30:00 GMT+0800';
-  const ethUSD = 550;
-  const qeyUSD = 0.15;
-
-  const ethToQeyRate = new web3.BigNumber((ethUSD / qeyUSD).toString());
-
   const openingTime = new Date(startDate).getTime() / 1000;
   const closingTime = openingTime + duration.weeks(6);
-
-  const hardCapInUSD = 15000000;
-  const soldPrivateSaleETH = 1000;
-  const soldPrivateSaleUSD = soldPrivateSaleETH * ethUSD;
-  const soldPrivateSaleQEY = soldPrivateSaleETH * ethToQeyRate;
-  const hardCapRemainUSD = hardCapInUSD - soldPrivateSaleUSD;
-  const softCapInUSD = 3000000;
-  const hardCapInEth = new web3.BigNumber((hardCapRemainUSD / ethUSD).toString()).toNumber();
-  const hardCapInWei = hardCapInEth * (10 ** 18); // maximum amount of wei accepted in the crowdsale
-  const softCapInEth = new web3.BigNumber((softCapInUSD / ethUSD).toString()).toNumber();
-  const softCapInWei = softCapInEth * (10 ** 18); // minimum amount of funds to be raised in weis
-
-  console.log(openingTime, closingTime, ethToQeyRate, wallet, hardCapInWei, tokenWallet, softCapInWei);
-
-  const firstBonus = ethToQeyRate.mul(1.10);
-  const secondBonus = ethToQeyRate.mul(1.05);
-  const finalRate = ethToQeyRate;
-
-  const startTime = openingTime;
   const firstTimeBonusChange = openingTime + duration.weeks(1);
   const secondTimeBonusChange = openingTime + duration.weeks(2);
+
+  const ethUSD = 550; // abitrary rate for testing
+  const qeyUSD = 0.15; // $0.15 per QEY
+  const ethToQeyRate = new web3.BigNumber((ethUSD / qeyUSD).toFixed(0));
+
+  const hardCapInUSD = 15000000;
+  const soldPrivateSaleETH = 10000;
+  const soldPrivateSaleUSD = soldPrivateSaleETH * ethUSD;
+  const hardCapRemainUSD = hardCapInUSD - soldPrivateSaleUSD;
+  const softCapInUSD = 3000000;
+  const hardCapInEth = new web3.BigNumber((hardCapRemainUSD / ethUSD).toFixed(0));
+  const hardCapInWei = (new web3.BigNumber(10).pow(18)).mul(hardCapInEth); // maximum amount of wei accepted in the crowdsale
+  const softCapInEth = new web3.BigNumber((softCapInUSD / ethUSD).toFixed(0));
+  const softCapInWei = (new web3.BigNumber(10).pow(18)).mul(softCapInEth); // minimum amount of funds to be raised in weis
+
+  const firstBonus = ethToQeyRate.mul(1.10).round(0);
+  const secondBonus = ethToQeyRate.mul(1.05).round(0);
+  const finalRate = ethToQeyRate;
+
+  const minCapPerAddress = ether(0.1);
+  const maxCapPerAddress = ether(500);
+  // ===== end crowdsale variables =====
 
   console.log('=============Start Deploy============');
 
