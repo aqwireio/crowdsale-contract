@@ -16,3 +16,8 @@ config/test/contracts.json
 build
 dist
 
+# env variables
+.env
+
+# generated files
+.node-xmlhttprequest*
