@@ -1,7 +1,4 @@
-<a href="https://aqwire.io/">
-    <img src="https://cdn-images-1.medium.com/max/1000/1*oWcFukUctnjw0SHBWBSxEA.png"
-         align="right" valign="top" alt="AQWIRE logo" />
-</a>
+<a href="https://aqwire.io/"><img src="https://cdn-images-1.medium.com/max/1000/1*oWcFukUctnjw0SHBWBSxEA.png" align="right" valign="top" alt="AQWIRE logo" /></a>
 
 # AQWIRE Token Sale
 
@@ -19,15 +16,36 @@ Among other things, it can be used on the platform to:
 - Get significant discounts on a property, etc.
 
 **Details:**
-> Token Supply: 180 million | 90 million will be sold (50%)
+> Token name: Aqwire Token
 
-> Price per token: $0.11
+> Token symbol: QEY
 
-> Cap: $9.9M Hardcap | $5M Softcap
+> Decimal: 18
 
-> Duration: Presale is LIVE and will run until June 15.
+> Total supply: 250million QEY
 
-> Bonuses: Up to 15% Bonus.
+> Token allocation for sale: 40% or 100M QEY tokens
+
+> Crowdsale will start (DATE TBD) 6pm Philippines UTC+8
+
+> Duration: (WEEKS TBD) weeks
+
+> Unsold tokens at the end of the sale will be burnt
+
+> Tokens will be distributed at the end of the time duration.
+
+> Tokens not for crowdsale will be sent and stored in the company's multisig wallet.
+
+> 1st bonus tier of 10% for the 1st week of crowdsale
+
+> 2nd bonus tier of 5% for the 2nd week of crowdsale
+
+> Hardcap is set at USD $15M
+
+> Softcap is set at USD $3M
+
+> ETH / QEY rate will be locked in the date before the crowdsale.
+
 
 For more information about AQWIRE and the crowdsale, go to:
 
@@ -79,10 +97,47 @@ $ npm run migrate:testnet
 
 *The contracts are not yet audited*. 
 
+### Useful Resources
+**change default eth amount in Ganache**
+[Connect Ganache GUI to Ganache CLI? ](https://github.com/trufflesuite/ganache/issues/322)
+> you can modify your settings file:
+
+> MacOS: `~/Library/Application\ Support/Ganache/Settings`
+
+> Windows: `%APPDATA%\Ganache\Settings`
+
+> Linux: either `$XDG_CONFIG_HOME/Ganache/Settings` or `~/.config/Ganache/Settings`
+
+[Set custom ETH balance](https://github.com/trufflesuite/ganache/issues/84)
+
+add `"default_balance_ether": 100000` to `Settings` file:
+```
+{
+  "googleAnalyticsTracking": true,
+  "cpuAndMemoryProfiling": false,
+  "verboseLogging": false,
+  "firstRun": false,
+  "server": {
+    "hostname": "127.0.0.1",
+    "mnemonic": "...",
+    "network_id": 5777,
+    "port": 7545,
+    "total_accounts": 10,
+    "unlocked_accounts": [],
+    "vmErrorsOnRPCResponse": true,
+    "default_balance_ether": 1000000
+  },
+  "uuid": "...",
+  "randomizeMnemonicOnStart": false
+}
+```
+
 # Contributors
 
 * Andrey Shishkin <motive.do@gmail.com>
 * Scott Yu <scott@aqwire.io>
 
 
-   [truffle]: <http://truffleframework.com/>
+ [truffle]: <http://truffleframework.com/>
+
+

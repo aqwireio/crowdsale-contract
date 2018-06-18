@@ -21,7 +21,7 @@ contract('AqwireToken', accounts => {
   const _name = 'Aqwire Token';
   const _symbol = 'QEY';
   const _decimals = 18;
-  const _totalSupply = 250000000 * 1e+18;
+  const _totalSupply = (new web3.BigNumber(10).pow(_decimals)).mul(250000000).toNumber(); // 250M with 18 decimals
   
   beforeEach('setup contract for each test', async function () {
     aqwireToken = await AqwireToken.new({ from: _owner });
