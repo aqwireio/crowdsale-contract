@@ -95,6 +95,11 @@ If you want to test on the testnet, do the following:
 $ npm run migrate:testnet
 ```
 
+*flatten solidity files*
+```sh
+$ sh flatten.sh
+```
+
 *The contracts are not yet audited*. 
 
 ### Useful Resources
