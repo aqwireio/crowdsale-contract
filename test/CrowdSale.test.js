@@ -16,8 +16,7 @@ const AqwireContract = artifacts.require('./AqwireContract.sol');
 const AqwireToken = artifacts.require('./AqwireToken.sol');
 
 contract('AqwireContract', function (accounts) {
-  // ==== accounts setup ====
-
+  // ===== accounts setup =====
   // owner of the crowdsale
   const owner = accounts[0];
   // wallet address where collected eth will be forwarded to
@@ -33,11 +32,12 @@ contract('AqwireContract', function (accounts) {
   const unauthorized = accounts[7];
   const anotherAuthorized = accounts[8];
   
-  // ==== variables setup =====
-
+  // ===== start crowdsale variables =====
   const startDate = 'Sun Jul 1 2018 18:30:00 GMT+0800';
   const openingTime = new Date(startDate).getTime() / 1000;
   const closingTime = openingTime + duration.weeks(6);
+  const firstTimeBonusChange = openingTime + duration.weeks(1);
+  const secondTimeBonusChange = openingTime + duration.weeks(2);
 
   const ethUSD = 550; // abitrary rate for testing
   const qeyUSD = 0.15; // $0.15 per QEY
@@ -53,9 +53,15 @@ contract('AqwireContract', function (accounts) {
   const softCapInEth = new web3.BigNumber((softCapInUSD / ethUSD).toFixed(0));
   const softCapInWei = (new web3.BigNumber(10).pow(18)).mul(softCapInEth); // minimum amount of funds to be raised in weis
 
+  const firstBonus = ethToQeyRate.mul(1.10).round(0);
+  const secondBonus = ethToQeyRate.mul(1.05).round(0);
+  const finalRate = ethToQeyRate;
+
   const minCapPerAddress = ether(0.1);
   const maxCapPerAddress = ether(500);
+  // ===== end crowdsale variables =====
 
+  // ===== Variables used for testing =====
   const RATE = ethToQeyRate;
   const GOAL = softCapInWei;
   const CAP = hardCapInWei;
@@ -82,9 +88,9 @@ contract('AqwireContract', function (accounts) {
     this._value = ether(1);
     this._value2 = ether(2);
 
-    this.firstBonus = RATE.mul(1.10).round(0); //since we're dealing with wei <> qeybits
-    this.secondBonus = RATE.mul(1.05).round(0);
-    this.finalRate = RATE;
+    this.firstBonus = firstBonus;
+    this.secondBonus = secondBonus;
+    this.finalRate = finalRate;
   
     this.firstTimeBonusChange = this.startTime + duration.weeks(1);
     this.secondTimeBonusChange = this.startTime + duration.weeks(2);

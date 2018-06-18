@@ -138,6 +138,6 @@ add `"default_balance_ether": 100000` to `Settings` file:
 * Scott Yu <scott@aqwire.io>
 
 
-   [truffle]: <http://truffleframework.com/>
+ [truffle]: <http://truffleframework.com/>
 
 
