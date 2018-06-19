@@ -30,13 +30,13 @@ module.exports = async function (deployer, network, accounts) {
   const firstTimeBonusChange = openingTime + duration.weeks(1);
   const secondTimeBonusChange = openingTime + duration.weeks(2);
 
-  const ethUSD = 550; // abitrary rate for testing
+  const ethUSD = 550; // abitrary rate (TBD)
   const qeyUSD = 0.15; // $0.15 per QEY
   const ethToQeyRate = new web3.BigNumber((ethUSD / qeyUSD).toFixed(0));
 
   const hardCapInUSD = 15000000;
   const soldPrivateSaleETH = 10000;
-  const soldPrivateSaleQEY = ethToQeyRate.mul(soldPrivateSaleETH).round(0);
+  const soldPrivateSaleQEY = ethToQeyRate.mul(new web3.BigNumber(web3.toWei(soldPrivateSaleETH, 'ether'))).round(0);
   const soldPrivateSaleUSD = soldPrivateSaleETH * ethUSD;
   const hardCapRemainUSD = hardCapInUSD - soldPrivateSaleUSD;
   const softCapInUSD = 3000000;
