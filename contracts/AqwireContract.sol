@@ -19,6 +19,8 @@ contract AqwireContract is CappedCrowdsale, AllowanceCrowdsale, RefundableCrowds
     * @param _hardCap Max amount of wei to be contributed 
     * @param _softCap Funding goal
     * @param _tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
+    * @param _minContribution Min amount of wei that must be contributed
+    * @param _maxContribution Max amount of wei that can be contributed per address
     */
 
     constructor(
@@ -29,6 +31,8 @@ contract AqwireContract is CappedCrowdsale, AllowanceCrowdsale, RefundableCrowds
         uint256 _hardCap,
         address _tokenWallet,
         uint256 _softCap,
+        uint256 _minContribution,
+        uint256 _maxContribution,
         ERC20 _token
     )
         public
@@ -37,7 +41,7 @@ contract AqwireContract is CappedCrowdsale, AllowanceCrowdsale, RefundableCrowds
         AllowanceCrowdsale(_tokenWallet)
         TimedCrowdsale(_openingTime, _closingTime)
         RefundableCrowdsale(_softCap)
-        IndividuallyCappedCrowdsale()
+        IndividuallyCappedCrowdsale(_minContribution, _maxContribution)
         Pausable()
         WhitelistedCrowdsale()
     {

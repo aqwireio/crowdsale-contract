@@ -66,6 +66,8 @@ module.exports = async function (deployer, network, accounts) {
       hardCapInWei,
       tokenWallet,
       softCapInWei,
+      minCapPerAddress,
+      maxCapPerAddress,
       AqwireToken.address,
       { from: owner }
     ).then(async function () {
