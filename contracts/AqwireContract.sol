@@ -48,6 +48,7 @@ contract AqwireContract is CappedCrowdsale, AllowanceCrowdsale, RefundableCrowds
         //As goal needs to be met for a successful crowdsale
         //the value needs to less or equal than a cap which is limit for accepted funds
         require(_softCap <= _hardCap);
+        require(_minContribution < _maxContribution);
     }
 
     uint256 public firstBonus;
@@ -75,6 +76,10 @@ contract AqwireContract is CappedCrowdsale, AllowanceCrowdsale, RefundableCrowds
         require(_firstBonus >= _secondBonus);
         require(_secondBonus >= _finalRate);
         require(_finalRate > 0);
+
+        require(_firstTimeBonusChange > _startTime);
+        require(_secondTimeBonusChange > _firstTimeBonusChange);
+        require(_startTime > 0);
         
         firstBonus = _firstBonus;
         secondBonus = _secondBonus;
