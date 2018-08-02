@@ -11,20 +11,17 @@ const duration = {
 };
 
 module.exports = async function (deployer, network, accounts) {
-  // multisig wallet address
-  const multisigWallet = '0xddf00a7540a7b68fdca13705b5c83b685518b716';
+  // multisigwallet address where collected eth will be forwarded to
+  const wallet = '0xBe91BB57BD54f9Ac75472E7f6556563960297548';
 
   // owner of the crowdsale
   const owner = accounts[0];
-    
-  // wallet address where collected eth will be forwarded to
-  const wallet = '0xddf00a7540a7b68fdca13705b5c83b685518b716'; // Develop
     
   // tokenWallet Address holding the tokens, which has approved allowance to the crowdsale
   const tokenWallet = accounts[0];
 
   // ===== start crowdsale variables =====
-  const startDate = 'Sun Aug 03 2018 18:30:00 GMT+0800';
+  const startDate = 'Mon, 08 Oct 2018 16:30:00 +0800'; // RFC 2822 format
   const openingTime = new Date(startDate).getTime() / 1000;
   const closingTime = openingTime + duration.weeks(6);
   const firstTimeBonusChange = openingTime + duration.weeks(1);
@@ -53,9 +50,9 @@ module.exports = async function (deployer, network, accounts) {
   const maxCapPerAddress = new web3.BigNumber(web3.toWei(500, 'ether'));
   // ===== end crowdsale variables =====
 
-  console.log('=============Start Deploy CrowdSale============');
-
   deployer.deploy(AqwireToken, { from: owner, overwrite: false}).then(function () {
+    console.log('============= Start Deploy Crowdsale Contract ============');
+
     const tokenAddress = AqwireToken.address;
     return deployer.deploy(
       AqwireContract,
@@ -81,9 +78,10 @@ module.exports = async function (deployer, network, accounts) {
       // setup Bonus rates
       await ContractInstance.setCurrentRate(firstBonus, secondBonus, finalRate, openingTime, firstTimeBonusChange, secondTimeBonusChange);
 
-      // await CoinInstance.transfer(tokenWallet, crowdSaleSupply, { from: owner });
+      // approve crowdsale contract with token supply for sale
       await CoinInstance.approve(crowdsaleAddress, crowdSaleSupply, { from: tokenWallet });
 
+      console.log('============= End Deploy Crowdsale Contract ============');
     });
   });
 };
