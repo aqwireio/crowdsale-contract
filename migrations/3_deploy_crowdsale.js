@@ -24,7 +24,7 @@ module.exports = async function (deployer, network, accounts) {
   const tokenWallet = accounts[0];
 
   // ===== start crowdsale variables =====
-  const startDate = 'Sun Jul 1 2018 18:30:00 GMT+0800';
+  const startDate = 'Sun Aug 03 2018 18:30:00 GMT+0800';
   const openingTime = new Date(startDate).getTime() / 1000;
   const closingTime = openingTime + duration.weeks(6);
   const firstTimeBonusChange = openingTime + duration.weeks(1);
@@ -53,9 +53,9 @@ module.exports = async function (deployer, network, accounts) {
   const maxCapPerAddress = new web3.BigNumber(web3.toWei(500, 'ether'));
   // ===== end crowdsale variables =====
 
-  console.log('=============Start Deploy============');
+  console.log('=============Start Deploy CrowdSale============');
 
-  deployer.deploy(AqwireToken, { from: owner }).then(function () {
+  deployer.deploy(AqwireToken, { from: owner, overwrite: false}).then(function () {
     const tokenAddress = AqwireToken.address;
     return deployer.deploy(
       AqwireContract,
@@ -75,16 +75,15 @@ module.exports = async function (deployer, network, accounts) {
       const crowdsaleAddress = AqwireContract.address;
       const ContractInstance = AqwireContract.at(crowdsaleAddress);
       const totalSupply = await CoinInstance.totalSupply({ from: owner });
+      const crowdSaleSupply = totalSupply - soldPrivateSaleQEY;
       await CoinInstance.addAddressToWhitelist(crowdsaleAddress, { from: owner });
       await CoinInstance.setUnlockTime(closingTime, { from: owner });
       // setup Bonus rates
       await ContractInstance.setCurrentRate(firstBonus, secondBonus, finalRate, openingTime, firstTimeBonusChange, secondTimeBonusChange);
 
-      // await CoinInstance.transfer(tokenWallet, totalSupply, { from: owner });
-      await CoinInstance.approve(crowdsaleAddress, totalSupply, { from: tokenWallet });
+      // await CoinInstance.transfer(tokenWallet, crowdSaleSupply, { from: owner });
+      await CoinInstance.approve(crowdsaleAddress, crowdSaleSupply, { from: tokenWallet });
 
-      // send sold qey during prsale to multisig
-      await CoinInstance.transfer(multisigWallet, soldPrivateSaleQEY, { from: owner });
     });
   });
 };
