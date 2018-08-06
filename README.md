@@ -83,6 +83,19 @@ The contracts can be tested and used using npm commands:
 | ``` npm run lint:all:fix ``` | lints and fixes the js and solidity files |
 
 
+### Deployment
+```
+# compile code
+truffle compile
+
+# deploy 1_initial_migration.js & 2_deploy_token.js
+truffle migrate --network development -f 1 --to 2
+
+# deploy 3_deploy_crowdsale.js
+truffle migrate --network development -f 3
+```
+
+
 ### Testnet Using Metamask and infura
 If you want to test on the testnet, do the following:
 
