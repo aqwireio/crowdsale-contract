@@ -33,7 +33,7 @@ contract('AqwireContract', function (accounts) {
   const anotherAuthorized = accounts[8];
   
   // ===== start crowdsale variables =====
-  const startDate = 'Sun Jul 1 2018 18:30:00 GMT+0800';
+  const startDate = 'Mon, 08 Oct 2018 16:30:00 +0800'; // RFC 2822 format
   const openingTime = new Date(startDate).getTime() / 1000;
   const closingTime = openingTime + duration.weeks(6);
   const firstTimeBonusChange = openingTime + duration.weeks(1);
@@ -44,7 +44,7 @@ contract('AqwireContract', function (accounts) {
   const ethToQeyRate = new web3.BigNumber((ethUSD / qeyUSD).toFixed(0));
 
   const hardCapInUSD = 15000000;
-  const soldPrivateSaleETH = 10000;
+  const soldPrivateSaleETH = 20000;
   const soldPrivateSaleQEY = ethToQeyRate.mul(new web3.BigNumber(web3.toWei(soldPrivateSaleETH, 'ether'))).round(0);
   const soldPrivateSaleUSD = soldPrivateSaleETH * ethUSD;
   const hardCapRemainUSD = hardCapInUSD - soldPrivateSaleUSD;
@@ -59,7 +59,9 @@ contract('AqwireContract', function (accounts) {
   const finalRate = ethToQeyRate;
 
   const minCapPerAddress = new web3.BigNumber(web3.toWei(0.1, 'ether'));
-  const maxCapPerAddress = new web3.BigNumber(web3.toWei(5, 'ether'));
+  // const maxCapPerAddress = new web3.BigNumber(web3.toWei(200, 'ether')); // KYC threshold
+  const maxCapPerAddress = hardCapInWei; // Equal to hardcap to fullfill some test cases. Realworld needs to be under KYC threshold
+
   // ===== end crowdsale variables =====
 
   // ===== Variables used for testing =====
