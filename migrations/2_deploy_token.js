@@ -15,8 +15,8 @@ module.exports = async function (deployer, network, accounts) {
     const tokenAddress = AqwireToken.address;
     const CoinInstance = AqwireToken.at(tokenAddress);
     const totalSupply = await CoinInstance.totalSupply({ from: owner });
-    // set unlocktime a year from deployment until crowdsale or manual override
-    await CoinInstance.setUnlockTime(oneYearFromNow);
+    // set unlocktime to freezing tokens a year from deployment until crowdsale or manual override
+    await CoinInstance.setUnlockTime(oneYearFromNow, { from: owner });
     // whitelist multisig wallet address, subsequent private sale addresses can be added here.
     await CoinInstance.addAddressToWhitelist(multisigWallet, { from: owner });
     console.log('============= End Deploy Token Contract ============');
